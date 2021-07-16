@@ -14,3 +14,8 @@
 .pragmatic_header_top {
      text-align: center
 }
+
+.mw_500 {
+    max-width: 500px;
+    padding: 1rem 1.5rem;
+}
