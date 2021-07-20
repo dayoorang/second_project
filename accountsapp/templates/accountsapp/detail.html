@@ -12,18 +12,19 @@
             {{ target_user.date_joined }}
         </div>
 
-        <div>
-            <a href ="{% url 'first_app:update' pk=target_user.pk %}">
-                Update Info
-            </a>
-        </div>
+        {% if user == target_user %}
+            <div>
+                <a href ="{% url 'first_app:update' pk=target_user.pk %}">
+                    Update Info
+                </a>
+            </div>
 
-        <div>
-            <a href ="{% url 'first_app:delete' pk=target_user.pk %}">
-                Quit
-            </a>
-        </div>
-
+            <div>
+                <a href ="{% url 'first_app:delete' pk=target_user.pk %}">
+                    Quit
+                </a>
+            </div>
+        {% endif %}
     </div>
 
 {% endblock %}
