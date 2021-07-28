@@ -54,6 +54,9 @@ class AccountUpdateView(UpdateView):
     success_url = reverse_lazy('first_app:hello_world')
     template_name = 'accountsapp/update.html'
 
+    def get_success_url(self):
+        return reverse('first_app:detail', kwargs= {'pk': self.object.pk})
+
 @method_decorator(has_ownership, 'get')
 @method_decorator(has_ownership, 'post')
 class AccountDeleteView(DeleteView):
