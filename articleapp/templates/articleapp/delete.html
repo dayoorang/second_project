@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+    <div class="text-center mw_500 m-auto">
+        <div class="m-5">
+            <h4>Update Article</h4>
+        </div>
+        <div>
+            <form action = "{% url 'articleapp:delete' pk=target_article.pk %} "
+                  method="post" >
+                {% csrf_token %}
+                <div class="m-5">
+                    <input type="submit"
+                        class="btn btn-danger rounded-pill px-5" value="삭제">
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
