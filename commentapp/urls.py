@@ -1,7 +1,10 @@
 
 from django.urls import path, include
 
+from commentapp.views import CommentCreationView
+
+app_name = 'commentapp'
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+    path('create/', CommentCreationView.as_view(), name = 'create'),
 
 ]
