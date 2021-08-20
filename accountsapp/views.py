@@ -1,16 +1,18 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 # Create your views here.
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
+from django.views.generic.list import MultipleObjectMixin
 
 from accountsapp.models import NewModel
-from accountsapp.templates.accountsapp.forms import AccountCreationForm
+from accountsapp.forms import AccountCreationForm
+from articleapp.models import Article
 from decorators import account_ownership_required
 
 
@@ -38,10 +40,17 @@ class AccountCreateView(CreateView):
     success_url = reverse_lazy('first_app:hello_world')
     template_name = 'accountsapp/create.html'
 
-class AccountDetailView(DetailView):
+class AccountDetailView(DetailView, MultipleObjectMixin):
     model = User
     context_object_name = 'target_user'
     template_name = 'accountsapp/detail.html'
+
+    paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        article_list = Article.objects.filter(writer=self.object)
+        return super().get_context_data(object_list=article_list,**kwargs)
+
 
 has_ownership = [login_required, account_ownership_required]
 

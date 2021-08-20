@@ -34,7 +34,6 @@
 
     <div class="container my-4">
         {% for article in article_list %}
-
             <div>
                 <a href="{% url 'articleapp:detail' pk=article.pk %}">
                     <img src="{{ article.image.url }}" alt="">
