@@ -1,5 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -10,28 +12,43 @@ from django.views.generic import RedirectView
 
 from articleapp.models import Article
 from likeapp.models import LikeRecord
+from projectapp.models import Project
+from subscribeapp.models import Subscription
+
+@transaction.atomic  # 원자화(쪼갤수 없게만들기)
+def db_transaction(user,article):
+
+
+    like_record = LikeRecord.objects.filter(user=user,
+                                            article=article)
+
+    if like_record.exists():  # 좋아요 반영 안되는 부분.
+        raise ValidationError('like already exists') # 유저가 보는부분이 아님
+
+    else:  # 좋아요 반영 되는 부분.
+        LikeRecord(user=user, article=article).save()
+
+    article.like += 1
+    article.save()
 
 
 @method_decorator(login_required,'get')
 class LikeArticleView(RedirectView):
     def get(self, request, *args, **kwargs):
-        user = request.user # 비로그인 유저는 오류걸리니까 로그인되어있어야함.
+        user = request.user
         article = Article.objects.get(pk=kwargs['article_pk'])
 
-        like_record = LikeRecord.objects.filter(user=user,
-                                                article=article)
+        try:
+            # 좋아요 반영 O
+            db_transaction(user, article)
+            messages.add_message(request, messages.SUCCESS, '좋아요가 반영되었습니다.')
+        except ValidationError:
+            # 좋아요 반영 X
+            messages.add_message(request, messages.ERROR, '좋아요는 한번만 가능합니다.')
+            return HttpResponseRedirect(reverse('articleapp:detail'
+                                                , kwargs={'pk': kwargs['article_pk']}))
 
-        if like_record.exists():
-            messages.add_message(request,messages.ERROR, '좋아요는 한번만 가능합니다' )
-            return HttpResponseRedirect(reverse('articleapp:detail', kwargs={'pk': kwargs['article_pk']}))
-        else:
-            LikeRecord(user=user,article=article).save()
-
-        article.like += 1
-        article.save()
-
-        messages.add_message(request, messages.SUCCESS, '좋아요가 반영되었습니다.')
         return super().get(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('articleapp:detail', kwargs={'pk': kwargs['article_pk']})
+        return reverse('articleapp:detail', kwargs={'pk':kwargs['article_pk']})
