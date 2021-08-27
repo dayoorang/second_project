@@ -17,7 +17,7 @@ class ProfileCreationView(CreateView):
     model = Profile
     form_class = ProfileCreationForm
     template_name = 'profileapp/create.html'
-    # success_url = reverse_lazy('first_app:hello_world')
+    success_url = reverse_lazy('articleapp:list')
 
 
     def form_valid(self, form): # 다 검증이 완료된후 실행되는 함수.. FBV 에서는 form.is_valid() 인듯..
@@ -34,7 +34,7 @@ class ProfileUpdateView(UpdateView):
     model = Profile
     form_class = ProfileCreationForm
     context_object_name = 'target_profile'
-    # success_url = reverse_lazy('first_app:hello_world')
+    success_url = reverse_lazy('articleapp:list')
     template_name = 'profileapp/update.html'
 
     def get_success_url(self):
